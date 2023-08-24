@@ -13,163 +13,161 @@ logging.basicConfig(level=logging.INFO)
 
 
 LAWS_DIR = './laws_test/'
-
-STOP_WORDS = set(
-    ["Статья",
-    "Глава",
-    "Раздел",
-    "Президент",
-     "ЧАСТЬ"]
-)
-
+INDEX_NAME = 'laws'
 MAX_LEN_METADATA_PINECONE = 20000
 
 class Codex:
 
-    def __init__(self, codex_name, header, top, parts, bottom, footer):
+    def __init__(self, codex_name, header, top, parts, footer):
         self.name = codex_name
         self.header = header
         self.top = top
         self.parts = parts
-        self.bottom = bottom
         self.footer = footer
 
         logging.info(f'Created Codex {codex_name} with {len(parts)} laws')
 
     @classmethod
     def from_text_data(cls, file_name:str, data:List[str]):
+        name = file_name.strip('-u.txt')
+
         parsed_n = 0
-        parsed, header = parse_header(data)
+        parsed, header = ParseFunctions.parse_header(data)
         parsed_n += parsed
 
-        parsed, top = parse_top(data[parsed_n:])
+        parsed, top = ParseFunctions.parse_top(data[parsed_n:])
         parsed_n += parsed
 
-        parsed, parts = parse_laws(data[parsed_n:])
+        parsed, parts = ParseFunctions.parse_laws(data[parsed_n:])
         parsed_n += parsed
 
-        parsed, footer = parse_footer(data)
+        parsed, footer = ParseFunctions.parse_footer(data)
 
         logging.info(f"Parsed {file_name} with {len(data)} lines")
-        cls(file_name, header, top, parts, footer)
+        return cls(name, header, top, parts, footer)
 
 
-def parse_header(data: List[str]) -> (int, str):
-    header = ""
+    def to_docs(self, text_max_len: int):
+        docs = []
+        for part in self.parts:
+            if len(part['details']) > text_max_len:
+                to_iter = self.divide_part(part, text_max_len)
+            else:
+                to_iter = [part]
+            for sub_part in to_iter:
+                doc = Document(page_content=sub_part["details"],
+                               metadata={'codex': self.name, 'article_num': sub_part["article"],
+                                         'article_name': sub_part['name']})
+                docs.append(doc)
+        return docs
 
-    parsed_n = 0
-    for line in data:
-        if line == "------------------------------------------------------------------\n":
-            break
-        parsed_n += 1
-        header += line
+    @staticmethod
+    def divide_part(part, text_max_len):
+        parts = []
 
-    return parsed_n, header.strip("\n")
+        t = ceil(len(part['details']) / text_max_len)
+        for i in range(t):
+            start = i * text_max_len
+            rem = len(part['details']) - start
+            end = min((i + 1) * text_max_len, rem)
+            sub_part = {
+                "details": part['details'][start:end],
+                "article": part['article'] + f' [PART {i + 1}/{t}]',
+                "name": part['name'] + f' [PART {i + 1}/{t}]'
+            }
+            parts.append(sub_part)
+        return parts
 
-def parse_top(data: List[str]) -> (int, str):
-    top = ""
+class ParseFunctions:
+    STOP_WORDS = {"Статья", "Глава", "Раздел", "Президент", "ЧАСТЬ"}
 
-    parsed_n = 0
-    for line in data:
-        wo_n = line.strip("\n")
-        if len(STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
-            break
-        parsed_n += 1
-        top += line
+    @staticmethod
+    def parse_header(data: List[str]) -> (int, str):
+        header = ""
 
-    return parsed_n, top.strip("\n")
+        parsed_n = 0
+        for line in data:
+            if line == "------------------------------------------------------------------\n":
+                break
+            parsed_n += 1
+            header += line
 
+        return parsed_n, header.strip("\n")
 
-def parse_law(data: List[str]) -> (int, Dict[str, Dict]):
-    # Parse all text in data until end or until stop word is reached
-    txt = data[0]
-    parsed_n = 1
+    @classmethod
+    def parse_top(cls, data: List[str]) -> (int, str):
+        top = ""
 
-    for line in data[1:]:
-        wo_n = line.strip("\n")
-        if len(STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
-            break
-        txt += line
-        parsed_n += 1
-
-    return parsed_n, txt
-
-
-def parse_laws(data: List[str]) -> (int, List[Dict]):
-    laws = []
-    i = 0
-
-    while i < len(data):
-        line = data[i]
-        if ("Статья" in line):
+        parsed_n = 0
+        for line in data:
             wo_n = line.strip("\n")
-            (full_name, name, article) = wo_n, " ".join(wo_n.split(" ")[2:]), wo_n.split(" ")[1].strip(".")
-            parsed_n, content = parse_law(data[i:])
-            laws.append({
-                "article": article,
-                "name": name,
-                "details": content
-            })
-            i += parsed_n
-        else:
-            i += 1
+            if len(cls.STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
+                break
+            parsed_n += 1
+            top += line
 
-    return (i, laws)
+        return parsed_n, top.strip("\n")
 
-def parse_footer(data: List[str]) -> (int, str):
-    footer = ""
+    @classmethod
+    def parse_law(cls, data: List[str]) -> (int, Dict[str, Dict]):
+        # Parse all text in data until end or until stop word is reached
+        txt = data[0]
+        parsed_n = 1
 
-    parsed_n = 0
-    for line in data:
-        wo_n = line.strip("\n")
-        if len(STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
-            break
-        parsed_n += 1
-        footer += line
+        for line in data[1:]:
+            wo_n = line.strip("\n")
+            if len(cls.STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
+                break
+            txt += line
+            parsed_n += 1
 
-    return parsed_n, footer.strip("\n")
+        return parsed_n, txt
 
+    @classmethod
+    def parse_laws(cls, data: List[str]) -> (int, List[Dict]):
+        laws = []
+        i = 0
 
+        while i < len(data):
+            line = data[i]
+            if ("Статья" in line):
+                wo_n = line.strip("\n")
+                (full_name, name, article) = wo_n, " ".join(wo_n.split(" ")[2:]), wo_n.split(" ")[1].strip(".")
+                parsed_n, content = cls.parse_law(data[i:])
+                laws.append({
+                    "article": article,
+                    "name": name,
+                    "details": content
+                })
+                i += parsed_n
+            else:
+                i += 1
 
-def divide_part(part, text_max_len):
-    parts = []
+        return (i, laws)
 
-    t = ceil(len(part['details']) / text_max_len)
-    for i in range(t):
-        start = i * text_max_len
-        rem = len(part['details']) - start
-        end = min((i + 1) * text_max_len, rem)
-        sub_part = {
-            "details":part['details'][start:end],
-            "article":part['article'] + f' [PART {i + 1}/{t}]',
-            "name":part['name'] + f' [PART {i + 1}/{t}]'
-        }
-        parts.append(sub_part)
-    return parts
+    @classmethod
+    def parse_footer(cls, data: List[str]) -> (int, str):
+        footer = ""
 
+        parsed_n = 0
+        for line in data:
+            wo_n = line.strip("\n")
+            if len(cls.STOP_WORDS.intersection(set(wo_n.split(" ")))) > 0:
+                break
+            parsed_n += 1
+            footer += line
 
-def codex_to_docs(codex, text_max_len):
-    docs = []
-    codex_name = codex['name']
-    for part in codex["parts"]:
-        if len(part['details']) > text_max_len:
-            to_iter = divide_part(part, text_max_len)
-        else:
-            to_iter = [part]
-        for sub_part in to_iter:
-            doc = Document(page_content=sub_part["details"], metadata={'codex':codex_name,'article_num':sub_part["article"], 'article_name':sub_part['name']})
-            docs.append(doc)
-    return docs
+        return parsed_n, footer.strip("\n")
 
 
 def ingest_codex(codex:Codex):
-    docs = codex_to_docs(codex, MAX_LEN_METADATA_PINECONE)
+    docs = codex.to_docs(MAX_LEN_METADATA_PINECONE)
     embeddings = OpenAIEmbeddings(embedding_ctx_length=7000)
-    vector_store = Pinecone.from_existing_index(index_name='laws-test', embedding=embeddings)
+    vector_store = Pinecone.from_existing_index(index_name=INDEX_NAME, embedding=embeddings)
     if not vector_store:
         vector_store = Pinecone.from_documents(documents=docs,
                                      embedding=embeddings,
-                                     index_name='laws-test',
+                                     index_name=INDEX_NAME,
                                      batch_size=4)
     else:
         vector_store.add_documents(documents=docs,
