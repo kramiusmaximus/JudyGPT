@@ -1,1 +1,1 @@
-web: ./init.sh
+web: python main
