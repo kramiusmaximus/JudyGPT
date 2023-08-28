@@ -11,8 +11,8 @@ dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 
-LAWS_DIR = os.getenv("LAWS_DIR")
-INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
+LAWS_DIR='./laws_test/'
+INDEX_NAME = 'laws-cosine'
 MAX_LEN_METADATA_PINECONE = 20000
 
 class Codex:
