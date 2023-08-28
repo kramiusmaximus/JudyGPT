@@ -1,7 +1,6 @@
 import os
 from math import ceil
 from typing import List, Dict
-
 import logging
 from langchain.vectorstores import Pinecone
 from langchain.embeddings import OpenAIEmbeddings
@@ -12,8 +11,8 @@ dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 
-LAWS_DIR = './laws_test/'
-INDEX_NAME = 'laws'
+LAWS_DIR = os.getenv("LAWS_DIR")
+INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 MAX_LEN_METADATA_PINECONE = 20000
 
 class Codex:
