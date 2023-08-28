@@ -1,1 +1,1 @@
-web: python srcs/main.py
+web: init.sh
