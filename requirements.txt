@@ -7,10 +7,13 @@ attrs==23.1.0
 blinker==1.6.2
 cachetools==5.3.1
 certifi==2023.7.22
+cffi==1.15.1
 charset-normalizer==3.2.0
 click==8.1.7
+cryptography==41.0.3
 dataclasses-json==0.5.14
 dnspython==2.4.2
+Flask==2.3.3
 frozenlist==1.4.0
 gitdb==4.0.10
 GitPython==3.1.32
@@ -20,6 +23,7 @@ httpcore==0.17.3
 httpx==0.24.1
 idna==3.4
 importlib-metadata==6.8.0
+itsdangerous==2.1.2
 Jinja2==3.1.2
 jsonschema==4.19.0
 jsonschema-specifications==2023.7.1
@@ -42,6 +46,7 @@ Pillow==9.5.0
 pinecone-client==2.2.2
 protobuf==4.24.2
 pyarrow==13.0.0
+pycparser==2.21
 pydantic==1.10.12
 pydeck==0.8.0
 Pygments==2.16.1
@@ -73,5 +78,6 @@ tzdata==2023.3
 tzlocal==4.3.1
 urllib3==2.0.4
 validators==0.21.2
+Werkzeug==2.3.7
 yarl==1.9.2
 zipp==3.16.2
