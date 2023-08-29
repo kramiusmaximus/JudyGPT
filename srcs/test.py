@@ -33,5 +33,5 @@ def send_message(chat_id, text):
 
 if __name__ == '__main__':
     # run the app with SSL context for secure webhook communication
-    app.run(host='0.0.0.0', port=os.getenv('PORT'), ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=os.getenv('PORT'))
 
