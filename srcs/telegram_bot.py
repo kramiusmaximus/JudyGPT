@@ -16,7 +16,7 @@ class TelegramBot:
         self.application.add_handlers(handlers)
         logging.debug("Telegram bot initialized")
     def run(self):
-        self.application.run_polling()
+        self.application.run_webhook(listen="0.0.0.0", port=8443, cert='./certificate/YOURPUBLIC.pem', key='./certificate/YOURPRIVATE.key', webhook_url="https://109.93.43.89:8443/wh")
         logging.info("Telegram bot started.")
 
 class TelegramChainBot(TelegramBot):
