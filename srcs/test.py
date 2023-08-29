@@ -19,6 +19,10 @@ def webhook():
     send_message(chat_id, response_text)
     return 'ok'
 
+@app.route('/', methods=['GET'])
+def main():
+    return 'hello, dear friend'
+
 def send_message(chat_id, text):
     # send a message to the specified chat ID
     token = os.getenv('TELEGRAM_BOT_TOKEN')
