@@ -10,11 +10,8 @@ from langchain_stuff import myChain
 logging.basicConfig(level=logging.INFO)
 dotenv.load_dotenv()
 
-def add_config(app, bot, port, debug):
-    app.config['BOT'] = bot
-    app.config['PORT'] = os.getenv('PORT', 443)
-    app.config['HOST'] = '0.0.0.0'
-    app.config['DEBUG'] = debug
+WEB_HOOK_PATH = '/web_hook'
+WEB_HOOK_URL = os.getenv('DOMAIN_NAME') + WEB_HOOK_PATH
 
 if __name__ == "__main__":
 
@@ -28,8 +25,7 @@ if __name__ == "__main__":
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
     handlers = get_handlers(chain)
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, os.getenv('DOMAIN_NAME') + "herokuapp.com/wh", chain)
-    add_config(app, bot, os.getenv('PORT', 433), os.getenv('DEBUG'))
+    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, WEB_HOOK_URL, chain)
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
 
 

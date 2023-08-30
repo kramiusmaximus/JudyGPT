@@ -14,7 +14,7 @@ app = Flask(__name__)
 def test():
     return 'test'
 
-@app.route('/wh', methods=['POST'])
+@app.route('/web_hook', methods=['POST'])
 def webhook():
     data = request.json
     chat_id = data['message']['chat']['id']
