@@ -1,4 +1,7 @@
 import logging
+
+import requests
+from flask import Flask, request
 from telegram.ext import filters, ApplicationBuilder
 from langchain_stuff import myChain
 
@@ -11,16 +14,22 @@ logging.basicConfig(
 chat_history = {}
 
 class TelegramBot:
-    def __init__(self, token, handlers):
+
+    def __init__(self, token, handlers, url):
         self.application = ApplicationBuilder().token(token).build()
         self.application.add_handlers(handlers)
+        self.web_hook_url = url
+
         logging.debug("Telegram bot initialized")
+
     def run(self):
-        self.application.run_webhook(listen="0.0.0.0", port=8443, cert='./certificate/YOURPUBLIC.pem', key='./certificate/YOURPRIVATE.key', webhook_url="https://109.93.43.89:8443/wh")
+        self.application.run_webhook(listen="0.0.0.0", port=443, webhook_url=self.web_hook_url)
+
         logging.info("Telegram bot started.")
 
+
 class TelegramChainBot(TelegramBot):
-    def __init__(self, token, handlers, chain:myChain):
-        super().__init__(token, handlers)
-        self.chain = myChain
+    def __init__(self, token, handlers, url, chain:myChain):
+        super().__init__(token, handlers, url)
+        self.chain = chain
 
