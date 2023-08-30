@@ -3,9 +3,10 @@ import os
 import requests
 from flask import Flask, request
 
-from srcs.langchain_stuff import myChain
-from srcs.telegram_bot_handlers import get_handlers
+from langchain_stuff import myChain
 from telegram_bot import TelegramChainBot
+
+INTRODUCTION_TEMPLATE = "Добрый день! я бот Юрист. Задайте ваш юридический вопрос, и опишите его максимально подробно. Я посотраюсь на ваш вопрос ответить."
 
 
 app = Flask(__name__)
@@ -16,15 +17,16 @@ def test():
 
 @app.route('/web_hook', methods=['POST'])
 def webhook():
+    bot: TelegramChainBot = app.config['BOT']
+
     data = request.json
     chat_id = data['message']['chat']['id']
     text = data['message']['text']
-    response_text = f"You said: {text}"
-    send_message(chat_id, response_text)
+    response_text = bot.chain.handle_question(text)
+    send_message(bot.token, chat_id, response_text)
     return 'ok'
 
-def send_message(chat_id, text):
-    token = 'YOUR_TELEGRAM_BOT_TOKEN'
+def send_message(token, chat_id, text):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     payload = {'chat_id': chat_id, 'text': text}
     response = requests.post(url, json=payload)

@@ -1,9 +1,7 @@
 import os
 import logging
 import dotenv
-from web_server import app
 
-from telegram_bot_handlers import get_handlers
 from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 
@@ -27,11 +25,11 @@ if __name__ == "__main__":
     # print(f"Answer: {res['result']}")
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
-    handlers = get_handlers(chain)
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, WEB_HOOK_URL, os.getenv('PORT'), chain)
-    bot.run()
-    # add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
-    # app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
+    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
+
+    from web_server import app
+    add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
+    app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
 
 
 

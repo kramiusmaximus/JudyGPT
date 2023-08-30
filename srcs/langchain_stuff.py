@@ -73,24 +73,21 @@ class myChain:
         # query_topic = get_topic(query)
         # res = qa({'query': query, 'query_topic': query_topic})
 
-    def get_topic(self, question: str) -> str:
+    def _get_topic(self, question: str) -> str:
         response = self.query_compression_chain({'input': question})
         return response['text']
 
-    def make_query(self, query):
-        query_topic = self.get_topic(query)
+    def _make_query(self, query):
+        query_topic = self._get_topic(query)
         return self.qa_chain({'query': query, 'query_topic': query_topic})
 
-    async   def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        user_id = update.message.from_user.username
-        user_msg = update.message.text
-
-        query_response = self.make_query(user_msg)
+    def handle_question(self, query):
+        query_response = self._make_query(query)
         logging.info(query_response)
         query_response_msg = query_response['result']
         query_response_srcs = [document.metadata['codex'] + ' - ст.' + document.metadata['article_num'] + ' - ' + document.metadata['article_name'] for document in query_response['source_documents']]
         response = query_response_msg + '\n\nРесурсы:'
         for src in query_response_srcs:
             response += '\n' + src
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=response)
+        return response
 
