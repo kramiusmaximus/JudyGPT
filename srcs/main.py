@@ -13,6 +13,14 @@ dotenv.load_dotenv()
 WEB_HOOK_PATH = '/web_hook'
 WEB_HOOK_URL = os.getenv('DOMAIN_NAME') + WEB_HOOK_PATH
 
+def add_config(app, bot, port, debug, web_hook_path):
+    app.config['BOT'] = bot
+    app.config['PORT'] = port
+    app.config['HOST'] = '0.0.0.0'
+    app.config['DEBUG'] = debug
+
+
+
 if __name__ == "__main__":
 
 
@@ -26,6 +34,7 @@ if __name__ == "__main__":
     chain = myChain()
     handlers = get_handlers(chain)
     bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, WEB_HOOK_URL, chain)
+    add_config(app, bot, os.getenv('PORT', 433), os.getenv('DEBUG'), WEB_HOOK_PATH)
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
 
 
