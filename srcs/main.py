@@ -28,7 +28,7 @@ if __name__ == "__main__":
     bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
 
     from web_server import app
-    add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
+    add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'))
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
     logging.info("Flask app started")
 
