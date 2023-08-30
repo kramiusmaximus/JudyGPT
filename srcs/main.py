@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
     handlers = get_handlers(chain)
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, os.getenv('HEROKU_APP_NAME') + "herokuapp.com/wh", chain)
+    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), handlers, os.getenv('DOMAIN_NAME') + "herokuapp.com/wh", chain)
     add_config(app, bot, os.getenv('PORT', 433), os.getenv('DEBUG'))
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
 
