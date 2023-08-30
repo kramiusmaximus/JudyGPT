@@ -1,3 +1,4 @@
+import logging
 import os
 
 import requests
@@ -17,6 +18,7 @@ def test():
 
 @app.route('/web_hook', methods=['POST'])
 def webhook():
+    logging.info("web_hook request recieved")
     bot: TelegramChainBot = app.config['BOT']
 
     data = request.json

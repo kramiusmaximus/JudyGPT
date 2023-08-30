@@ -25,11 +25,12 @@ if __name__ == "__main__":
     # print(f"Answer: {res['result']}")
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
+    #bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
 
     from web_server import app
-    add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
+    add_config(app, None, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
+    logging.info("Flask app started")
 
 
 
