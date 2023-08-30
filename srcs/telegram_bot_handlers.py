@@ -7,7 +7,7 @@ INTRODUCTION_TEMPLATE = "Добрый день! я бот Юрист. Задай
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=INTRODUCTION_TEMPLATE)
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, ass=None):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.username
     user_msg = update.message.text
 

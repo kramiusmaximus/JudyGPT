@@ -13,23 +13,17 @@ logging.basicConfig(
 
 chat_history = {}
 
-class TelegramBot:
-
-    def __init__(self, token, handlers, url):
+class TelegramChainBot:
+    def __init__(self, token, handlers, url, port, chain:myChain):
         self.application = ApplicationBuilder().token(token).build()
         self.application.add_handlers(handlers)
         self.web_hook_url = url
+        self.port = port
+        self.chain = chain
 
         logging.debug("Telegram bot initialized")
 
     def run(self):
-        self.application.run_webhook(listen="0.0.0.0", port=443, webhook_url=self.web_hook_url)
+        self.application.run_webhook(listen="0.0.0.0", port=self.port, webhook_url=self.web_hook_url)
 
-        logging.info("Telegram bot started.")
-
-
-class TelegramChainBot(TelegramBot):
-    def __init__(self, token, handlers, url, chain:myChain):
-        super().__init__(token, handlers, url)
-        self.chain = chain
 

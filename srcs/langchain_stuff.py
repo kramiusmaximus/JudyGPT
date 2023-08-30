@@ -74,13 +74,14 @@ class myChain:
         # res = qa({'query': query, 'query_topic': query_topic})
 
     def get_topic(self, question: str) -> str:
-
         response = self.query_compression_chain({'input': question})
         return response['text']
+
     def make_query(self, query):
         query_topic = self.get_topic(query)
         return self.qa_chain({'query': query, 'query_topic': query_topic})
-    async   def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE, ass=None):
+
+    async   def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.username
         user_msg = update.message.text
 
