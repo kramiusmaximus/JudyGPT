@@ -11,7 +11,7 @@ dotenv.load_dotenv()
 WEB_HOOK_PATH = '/web_hook'
 WEB_HOOK_URL = os.getenv('DOMAIN_NAME', 'http://192.168.1.90') + WEB_HOOK_PATH
 
-def add_config(app, bot, port, debug, web_hook_path):
+def add_config(app, bot, port, debug):
     app.config['BOT'] = bot
     app.config['PORT'] = port
     app.config['HOST'] = '0.0.0.0'
@@ -25,10 +25,10 @@ if __name__ == "__main__":
     # print(f"Answer: {res['result']}")
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
-    #bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
+    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
 
     from web_server import app
-    add_config(app, None, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
+    add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'), WEB_HOOK_PATH)
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
     logging.info("Flask app started")
 
