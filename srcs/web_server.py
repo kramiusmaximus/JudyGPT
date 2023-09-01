@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -27,10 +28,11 @@ def webhook():
     response_text = 'hi'
 
    # response_text = bot.chain.handle_question(text)
-    send_message(bot.token, chat_id, response_text)
+    asyncio.create_task(send_message(bot.token, chat_id, response_text))
+
     return 'ok'
 
-def send_message(token, chat_id, text):
+async def send_message(token, chat_id, text):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     payload = {'chat_id': chat_id, 'text': text}
     response = requests.post(url, json=payload)
