@@ -24,7 +24,9 @@ def webhook():
     data = request.json
     chat_id = data['message']['chat']['id']
     text = data['message']['text']
-    response_text = bot.chain.handle_question(text)
+    response_text = 'hi'
+
+   # response_text = bot.chain.handle_question(text)
     send_message(bot.token, chat_id, response_text)
     return 'ok'
 
