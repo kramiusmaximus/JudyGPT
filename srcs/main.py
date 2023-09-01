@@ -25,9 +25,7 @@ if __name__ == "__main__":
     # print(f"Answer: {res['result']}")
     # print(f"Sources: {res['source_documents']}")
     chain = myChain()
-    logging.info("test1")
     bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, os.getenv('PORT'), chain)
-    logging.info("test2")
     from web_server import app
     add_config(app, bot, os.getenv('PORT', 443), os.getenv('DEBUG'))
     app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
