@@ -20,6 +20,6 @@ class TelegramChainBot:
         self.web_hook_url = url
         self.port = port
         self.chain: myChain = chain
-        self.application.run_webhook(webhook_url=self.web_hook_url)
+        self.application.run_webhook(port=self.port, webhook_url=self.web_hook_url)
 
 
