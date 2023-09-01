@@ -15,6 +15,7 @@ chat_history = {}
 
 class TelegramChainBot:
     def __init__(self, token, url, port, chain:myChain):
+        logging.info(f'url - {url}, port {port}')
         self.token = token
         self.application = ApplicationBuilder().token(token).build()
         self.web_hook_url = url
