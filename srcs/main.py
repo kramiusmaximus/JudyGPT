@@ -1,9 +1,11 @@
 import os
 import logging
 import dotenv
-
+from requests import post
 from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
+from fastapi import FastAPI, Response
+from models import Update
 
 logging.basicConfig(level=logging.INFO)
 dotenv.load_dotenv()
@@ -11,25 +13,33 @@ dotenv.load_dotenv()
 WEB_HOOK_PATH = '/web_hook'
 WEB_HOOK_URL = os.getenv('DOMAIN_NAME', 'http://192.168.1.90') + WEB_HOOK_PATH
 
-def add_config(app, bot:TelegramChainBot, port:int, debug:bool):
-    app.config['BOT'] = bot
-    app.config['PORT'] = port
-    app.config['HOST'] = '0.0.0.0'
-    app.config['DEBUG'] = debug
+app = FastAPI()
+
+chain = myChain()
+bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, int(os.getenv('PORT')), chain)
+
+@app.get('/test')
+async def test_get():
+    return 'test'
+
+@app.post('/web_hook')
+def webhook(data: Update):
+    logging.info(data)
+    logging.info("web_hook request recieved")
+    text = data.message.text
+    status_code = bot.chain.handle_question(text)
+
+    return Response(status_code=status_code)
+
+def send_message(token, chat_id, text):
+    url = f'https://api.telegram.org/bot{token}/sendMessage'
+    payload = {'chat_id': chat_id, 'text': text}
+
+    return post(url, payload)
 
 
 
-if __name__ == "__main__":
-    # print(f"Query: {res['query']}")
-    # print(f"Query Topic: {res['query_topic']}")
-    # print(f"Answer: {res['result']}")
-    # print(f"Sources: {res['source_documents']}")
-    chain = myChain()
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, int(os.getenv('PORT')), chain)
-    from web_server import app
-    add_config(app, bot, int(os.getenv('PORT', 443)), bool(os.getenv('DEBUG')))
-    app.run(app.config['HOST'], app.config['PORT'], app.config['DEBUG'])
-    logging.info("Flask app started")
+
 
 
 

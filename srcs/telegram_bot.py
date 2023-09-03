@@ -1,7 +1,6 @@
 import logging
 
 import requests
-from flask import Flask, request
 from telegram.ext import filters, ApplicationBuilder
 from langchain_stuff import myChain
 

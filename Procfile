@@ -1,1 +1,1 @@
-web: python ./srcs/main.py
+web: uvicorn --app-dir /lawya/srcs main:app --reload
