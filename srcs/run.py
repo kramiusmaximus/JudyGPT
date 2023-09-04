@@ -6,4 +6,4 @@ from srcs import logging_setup
 if __name__ == '__main__':
     logging_setup.setup()
     logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
-    uvicorn.run("main:app", port=int(os.getenv('PORT')), log_config='logging.yaml')
+    uvicorn.run("server:app", host=os.getenv('HOST'), port=int(os.getenv('PORT')), log_config='logging.yaml')

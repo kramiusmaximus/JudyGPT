@@ -1,13 +1,13 @@
 import logging
+import os
 
 import requests
 from telegram.ext import filters, ApplicationBuilder
 from langchain_stuff import myChain
 
 
-logging.basicConfig(
-    level=logging.INFO
-)
+logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
+
 
 chat_history = {}
 

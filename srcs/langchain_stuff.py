@@ -12,7 +12,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 import pinecone
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
 dotenv.load_dotenv()
 
 
