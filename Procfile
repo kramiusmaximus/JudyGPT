@@ -1,1 +1,1 @@
-web: uvicorn --app-dir /app/srcs main:app --log-config logging.yaml
+web: python main:app

@@ -48,18 +48,18 @@ class CustomFormatter(logging.Formatter):
 
 
 
+def setup():
+    try:
+        shutil.rmtree(ROOT_DIR + "/tmp")
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        raise e
+    os.mkdir(ROOT_DIR + "/tmp")
+    open(ROOT_DIR + "/tmp/out.log", 'a')
+    open(ROOT_DIR + "/tmp/err.log", 'a')
 
-try:
-    shutil.rmtree(ROOT_DIR + "/tmp")
-except FileNotFoundError:
-    pass
-except Exception as e:
-    raise e
-os.mkdir(ROOT_DIR + "/tmp")
-open(ROOT_DIR + "/tmp/out.log", 'a')
-open(ROOT_DIR + "/tmp/err.log", 'a')
-
-filename = 'logging.yaml'
-with open(ROOT_DIR + '/' + filename, 'rt') as file:
-    config = yaml.safe_load(file.read())
-    logging.config.dictConfig(config)
+    filename = 'logging.yaml'
+    with open(ROOT_DIR + '/' + filename, 'rt') as file:
+        config = yaml.safe_load(file.read())
+        logging.config.dictConfig(config)
