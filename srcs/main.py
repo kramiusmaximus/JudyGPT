@@ -6,11 +6,10 @@ from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response
 from models import Update
-from logging_setup import setup
+import logging_setup
 
 dotenv.load_dotenv()
 
-setup()
 logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
 
 WEB_HOOK_PATH = '/web_hook'

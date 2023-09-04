@@ -6,13 +6,17 @@ formatters:
         (): logging_setup.CustomFormatterColored
     standard:
         (): logging_setup.CustomFormatter
+filters:
+    warning_filter:
+        (): logging_setup.WarningFilter
 
 handlers:
     stdout:
         class: logging.StreamHandler
         level: DEBUG
-        formatter: standard
+        formatter: standard_colored
         stream: ext://sys.stdout
+        filters: [warning_filter]
 
     stderr:
         class: logging.StreamHandler

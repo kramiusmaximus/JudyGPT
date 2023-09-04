@@ -7,6 +7,9 @@ import dotenv
 dotenv.load_dotenv()
 ROOT_DIR = os.getenv('ROOT_DIR')
 
+class WarningFilter(logging.Filter):
+    def filter(self, rec):
+        return rec.levelno <= logging.WARNING
 
 class CustomFormatterColored(logging.Formatter):
 
@@ -43,22 +46,20 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-class WarningFilter(logging.Filter):
-    def filter(self, rec):
-        return rec.levelno <= logging.WARNING
 
-def setup():
-    try:
-        shutil.rmtree(ROOT_DIR + "/tmp")
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        raise e
-    os.mkdir(ROOT_DIR + "/tmp")
-    open(ROOT_DIR + "/tmp/out.log", 'a')
-    open(ROOT_DIR + "/tmp/err.log", 'a')
 
-    filename = 'logging.yaml'
-    with open(ROOT_DIR + '/' + filename, 'rt') as file:
-        config = yaml.safe_load(file.read())
-        logging.config.dictConfig(config)
+
+try:
+    shutil.rmtree(ROOT_DIR + "/tmp")
+except FileNotFoundError:
+    pass
+except Exception as e:
+    raise e
+os.mkdir(ROOT_DIR + "/tmp")
+open(ROOT_DIR + "/tmp/out.log", 'a')
+open(ROOT_DIR + "/tmp/err.log", 'a')
+
+filename = 'logging.yaml'
+with open(ROOT_DIR + '/' + filename, 'rt') as file:
+    config = yaml.safe_load(file.read())
+    logging.config.dictConfig(config)
