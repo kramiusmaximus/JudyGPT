@@ -6,16 +6,16 @@ from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response
 from models import Update
-import logging_setup
-import uvicorn
 
 dotenv.load_dotenv()
-
+logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
 
 WEB_HOOK_PATH = '/web_hook'
 WEB_HOOK_URL = os.getenv('DOMAIN_NAME', 'http://192.168.1.90') + WEB_HOOK_PATH
 
 app = FastAPI()
+chain = myChain()
+bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, int(os.getenv('PORT')), chain)
 
 
 
@@ -25,7 +25,7 @@ async def test_get():
     return 'test'
 
 @app.post('/web_hook')
-def webhook(data: Update):
+async def webhook(data: Update):
     logging.info(data)
     logging.info("web_hook request recieved")
     text = data.message.text
@@ -39,14 +39,10 @@ def send_message(token, chat_id, text):
 
     return post(url, payload)
 
-if __name__ == '__main__':
-    logging_setup.setup()
-    logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
 
-    chain = myChain()
-    bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, int(os.getenv('PORT')), chain)
 
-    uvicorn.run(app, host='0.0.0.0', port=int(os.getenv('PORT')), log_config='logging.yaml')
+
+
 
 
 
