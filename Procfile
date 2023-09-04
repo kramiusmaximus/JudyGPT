@@ -1,1 +1,1 @@
-web: uvicorn --app-dir /lawya/srcs main:app --reload
+web: uvicorn --app-dir /lawya/srcs main:app --log-config logging.yaml

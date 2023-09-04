@@ -6,9 +6,12 @@ from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response
 from models import Update
+from logging_setup import setup
 
-logging.basicConfig(level=logging.INFO)
 dotenv.load_dotenv()
+
+setup()
+logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
 
 WEB_HOOK_PATH = '/web_hook'
 WEB_HOOK_URL = os.getenv('DOMAIN_NAME', 'http://192.168.1.90') + WEB_HOOK_PATH
@@ -20,6 +23,7 @@ bot = TelegramChainBot(os.getenv('TELEGRAM_BOT_TOKEN'), WEB_HOOK_URL, int(os.get
 
 @app.get('/test')
 async def test_get():
+    logger.error('/test request recieved')
     return 'test'
 
 @app.post('/web_hook')
