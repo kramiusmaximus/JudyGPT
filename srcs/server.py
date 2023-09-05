@@ -8,6 +8,7 @@ from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response, APIRouter, Depends
 from models import Update
+import asyncio
 
 dotenv.load_dotenv()
 logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
@@ -45,13 +46,13 @@ async def webhook(update: Update):
     logging.info("web_hook request recieved")
     text = message.text
     response_text = bot.chain.handle_question(text)
-    response = send_message(TELEGRAM_TOKEN, message.chat.id, response_text)
+    asyncio.create_task(send_message(TELEGRAM_TOKEN, message.chat.id, response_text))
 
-    return Response(status_code=response.status_code)
+    return Response(status_code=200)
 
 app.include_router(api_router, dependencies=[Depends(log_request_info)])
 
-def send_message(token, chat_id, text):
+async def send_message(token, chat_id, text):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     payload = {'chat_id': chat_id, 'text': text}
 
