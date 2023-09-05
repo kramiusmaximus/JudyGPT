@@ -21,6 +21,7 @@ app = FastAPI()
 api_router = APIRouter()
 chain = myChain()
 bot = TelegramChainBot(TELEGRAM_TOKEN, WEB_HOOK_URL, int(os.getenv('PORT')), chain)
+loop = asyncio.get_event_loop()
 
 async def log_request_info(request: Request):
     request_body = await request.json()
@@ -44,30 +45,20 @@ async def webhook(update: Update):
     message = update.message
     logging.info(message)
     logging.info("web_hook request recieved")
-    text = message.text
-    response_text = bot.chain.handle_question(text)
-    asyncio.create_task(send_message(TELEGRAM_TOKEN, message.chat.id, response_text))
+    loop.run_in_executor(None, handle_webhook_message, TELEGRAM_TOKEN, message.chat.id, message.text)
 
     return Response(status_code=200)
 
 app.include_router(api_router, dependencies=[Depends(log_request_info)])
 
-async def send_message(token, chat_id, text):
+def handle_webhook_message(token, chat_id, message_text):
+    response_text = bot.chain.handle_question(message_text)
+    send_message(token, chat_id, response_text)
+    logging.info('webhook message handled')
+
+def send_message(token, chat_id, text):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     payload = {'chat_id': chat_id, 'text': text}
 
     return post(url, payload)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
