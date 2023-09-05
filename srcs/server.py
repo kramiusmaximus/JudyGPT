@@ -5,7 +5,7 @@ from requests import post
 from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response
-from models import Update
+from models import Message
 
 dotenv.load_dotenv()
 logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
@@ -26,14 +26,14 @@ async def test_get():
     return 'test'
 
 @app.post('/web_hook')
-async def webhook(data: Update):
+async def webhook(data: Message):
     logging.info(data)
     logging.info("web_hook request recieved")
-    text = data.message.text
+    text = data.text
     response_text = bot.chain.handle_question(text)
-    status_code = send_message(TELEGRAM_TOKEN, data.chat.id, response_text)
+    response = send_message(TELEGRAM_TOKEN, data.chat.id, response_text)
 
-    return Response(status_code=status_code)
+    return Response(status_code=response.status_code)
 
 def send_message(token, chat_id, text):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
