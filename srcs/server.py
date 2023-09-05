@@ -7,7 +7,7 @@ from starlette.requests import Request
 from telegram_bot import TelegramChainBot
 from langchain_stuff import myChain
 from fastapi import FastAPI, Response, APIRouter, Depends
-from models import Message
+from models import Update
 
 dotenv.load_dotenv()
 logger = logging.getLogger('prom') if os.getenv('ENV') == 'prom' else logging.getLogger('dev')
@@ -39,12 +39,13 @@ async def test_get():
     return 'test'
 
 @api_router.post('/web_hook')
-async def webhook(data: Message):
-    logging.info(data)
+async def webhook(update: Update):
+    message = update.message
+    logging.info(message)
     logging.info("web_hook request recieved")
-    text = data.text
+    text = message.text
     response_text = bot.chain.handle_question(text)
-    response = send_message(TELEGRAM_TOKEN, data.chat.id, response_text)
+    response = send_message(TELEGRAM_TOKEN, message.chat.id, response_text)
 
     return Response(status_code=response.status_code)
 

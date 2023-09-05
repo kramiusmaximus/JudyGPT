@@ -489,7 +489,7 @@ class InlineKeyboardMarkup(BaseModel):
 class Message(BaseModel):  # Checked
     message_id: int
     from_user: User = Field(None, alias='from')
-    date: datetime.datetime
+    date: int
     chat: Chat
     forward_from: User = None
     forward_from_chat: Chat = None
