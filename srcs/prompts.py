@@ -1,11 +1,20 @@
 from langchain import PromptTemplate
 
-question_prompt_template = """Вопрос: {question}
+question_prompt_template = """Может ли какой-либо текст из данного юридического документа дать ответ на Вопрос. Если найден соответствующий текст, верни его дословно.
+Вопрос: {question}
+
+Юридический документ:
+{context}
+
+Соответствующий текст, если таковой имеется:"""
+
+
+combine_prompt = """Вопрос: {question}
 
 Ответь на данный вопрос профессионально, обсуждая все важные моменты, ссылаясь на свои знания и ниже приведенные законы. Если не хватает информации для развернутого ответа, можешь запросить всю нужную тебе информацию.
 
 Законы:
-{context}
+{summaries}
 
 """
 
@@ -30,14 +39,18 @@ categorization_template = """
 Человек: Вопрос - {input}
 ИИ: """
 
+QUESTION_PROMPT = PromptTemplate(
+    template=question_prompt_template, input_variables=["context", "question"]
+)
+
 CATEGORIZATION_PROMPT = PromptTemplate(
     input_variables=["input"], template=categorization_template
 )
 
-EXAMPLE_PROMPT = PromptTemplate(
-    template="Content: {page_content}\nSource: {source}",
-    input_variables=["page_content", "source"],
+DOCUMENT_PROMPT = PromptTemplate(
+    template="Content: {page_content}\nSource: {codex} - ст. {article_num} - {article_name}",
+    input_variables=["page_content", "codex", "article_num", "article_name"],
 )
-QUESTION_PROMPT = PromptTemplate(
-    template=question_prompt_template, input_variables=["context", "question"]
+COMBINE_PROMPT = PromptTemplate(
+    template=combine_prompt, input_variables=["summaries", "question"]
 )
